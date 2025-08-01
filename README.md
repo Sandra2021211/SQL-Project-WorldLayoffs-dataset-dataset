@@ -1,1 +1,1 @@
-# SQL-Project-WorldLayoffs-dataset-dataset
+# SQL-Project-WorldLayoffs-dataset
