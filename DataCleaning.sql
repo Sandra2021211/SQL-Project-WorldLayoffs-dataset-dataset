@@ -113,7 +113,36 @@ ALTER TABLE layoffs_staging2 MODIFY COLUMN `date` DATE;
 SELECT * FROM layoffs_staging2;
 
 
-# 3. Null values or blank values
+-- 3. Null values or blank values
+
+SELECT * FROM layoffs_staging2 WHERE total_laid_off IS NULL AND percentage_laid_off IS NULL;
+
+SELECT * FROM layoffs_staging2 WHERE industry IS NULL OR industry='';
+
+SELECT * FROM layoffs_staging2 WHERE company LIKE 'Bally%';
+
+# To populate with values in the blank 'industry' column if the company and location are same values, use self join
+
+SELECT t1.industry, t2.industry FROM layoffs_staging2 t1
+JOIN layoffs_staging2 t2
+	ON t1.company=t2.company
+WHERE (t1.industry IS NULL OR t1.industry='')
+AND t2.industry IS NOT NULL;
+
+# Update with values
+
+UPDATE layoffs_staging2 t1
+JOIN layoffs_staging2 t2
+	ON t1.company=t2.company
+SET t1.industry=t2.industry
+WHERE (t1.industry IS NULL)
+AND t2.industry IS NOT NULL;
+
+# To update blank values with NULL values
+
+UPDATE layoffs_staging2 SET industry=NULL WHERE industry='';
+
+SELECT * FROM layoffs_staging2;
 
 
 # 4. Remove any columns
