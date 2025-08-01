@@ -8,7 +8,7 @@ CREATE TABLE layoffs_staging LIKE layoffs;
 
 SELECT * FROM layoffs_staging;
 
-INSERT layoffs_staging
+INSERT INTO layoffs_staging
 SELECT * FROM layoffs;
 
 -- 1.Remove duplicates
@@ -82,7 +82,7 @@ UPDATE layoffs_staging2
 SET industry='Crypto'
 WHERE industry LIKE 'Crypto%';
 
-# Updating United States and United States. as United States
+# Updating country United States and United States. as United States
 
 SELECT DISTINCT country FROM layoffs_staging2 ORDER BY 1;
 
@@ -95,12 +95,22 @@ UPDATE layoffs_staging2
 SET country= TRIM(TRAILING '.' FROM country)
 WHERE country LIKE 'United States%';
 
+# Update column 'date' from text to date
 
+SELECT `date`,
+STR_TO_DATE(`date`, '%m/%d/%Y')
+FROM layoffs_staging2;
 
+UPDATE layoffs_staging2
+SET `date` = STR_TO_DATE(`date`, '%m/%d/%Y');
 
+SELECT `date` FROM layoffs_staging2;
 
+# Altering the datatype of the 'date' column from text to date
 
+ALTER TABLE layoffs_staging2 MODIFY COLUMN `date` DATE;
 
+SELECT * FROM layoffs_staging2;
 
 
 # 3. Null values or blank values
