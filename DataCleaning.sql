@@ -145,6 +145,22 @@ UPDATE layoffs_staging2 SET industry=NULL WHERE industry='';
 SELECT * FROM layoffs_staging2;
 
 
-# 4. Remove any columns
+-- 4. Drop columns and Deleting rows
+
+# Deleting rows where total_laid_off is null and %_laid_off is also null since that might indicate that layoffs couldn't have taken place in that company
+
+SELECT * FROM layoffs_staging2 WHERE total_laid_off IS NULL AND percentage_laid_off IS NULL;
+
+DELETE FROM layoffs_staging2 WHERE total_laid_off IS NULL AND percentage_laid_off IS NULL;
+
+SELECT * FROM layoffs_staging2;
+
+# Dropping column row_num 
+
+ALTER TABLE layoffs_staging2
+DROP column row_num;
+
+SELECT * FROM layoffs_staging2;
+
 
 
