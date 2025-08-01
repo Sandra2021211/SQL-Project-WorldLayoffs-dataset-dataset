@@ -55,15 +55,49 @@ FROM layoffs_staging;
 SELECT * FROM layoffs_staging2 WHERE row_num>1;
 
 # To delete the duplicates
-SET SQL_SAFE_UPDATES = 0;
 DELETE FROM layoffs_staging2 WHERE row_num>1;
-SET SQL_SAFE_UPDATES = 1;
 
 SELECT * FROM layoffs_staging2;
 
 
 
-# 2. Standardize data
+-- 2. Standardize data
+
+# To trim the spaces
+
+SELECT company, TRIM(company) FROM layoffs_staging2;
+
+UPDATE layoffs_staging2 
+SET company= TRIM(company);
+
+SELECT * FROM layoffs_staging2;
+
+# Updating Crypto, CryptoCurrency and Crypto Currency as Crypto
+
+SELECT DISTINCT industry FROM layoffs_staging2 ORDER BY 1;
+
+SELECT * FROM layoffs_staging2 WHERE industry LIKE 'Crypto%';
+
+UPDATE layoffs_staging2
+SET industry='Crypto'
+WHERE industry LIKE 'Crypto%';
+
+# Updating United States and United States. as United States
+
+SELECT DISTINCT country FROM layoffs_staging2 ORDER BY 1;
+
+SELECT * FROM layoffs_staging2 WHERE country LIKE 'United States%';
+
+SELECT DISTINCT country, TRIM(TRAILING '.' FROM country)
+FROM layoffs_staging2 ORDER BY 1;
+
+UPDATE layoffs_staging2
+SET country= TRIM(TRAILING '.' FROM country)
+WHERE country LIKE 'United States%';
+
+
+
+
 
 
 
