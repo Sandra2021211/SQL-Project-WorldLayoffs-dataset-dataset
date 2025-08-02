@@ -78,7 +78,46 @@ FROM layoffs_staging2
 GROUP BY YEAR(`date`), MONTH(`date`)
 ORDER BY 1,2;
 
+SELECT * FROM layoffs_staging2;
 
+# Rolling sum
 
+SELECT SUBSTRING(`date`,1,7) AS `MONTH`, SUM(total_laid_off)
+FROM layoffs_staging2
+WHERE SUBSTRING(`date`,1,7) IS NOT NULL
+GROUP BY `MONTH`
+ORDER BY 1 ASC;
 
+WITH Rolling_Total AS
+(
+SELECT SUBSTRING(`date`,1,7) AS `MONTH`, SUM(total_laid_off) AS total_off
+FROM layoffs_staging2
+WHERE SUBSTRING(`date`,1,7) IS NOT NULL
+GROUP BY `MONTH`
+ORDER BY 1 ASC
+)
+SELECT `MONTH`, total_off, SUM(total_off) OVER(ORDER BY `MONTH`) AS rolling_total
+FROM Rolling_total;
+
+# to rank the year that has the highest layoffs
+
+SELECT company, YEAR(`date`), SUM(total_laid_off)
+FROM layoffs_staging2
+GROUP BY company, YEAR(`date`)
+ORDER BY 3 DESC;
+
+With Company_Year(company, years, total_laid_off) AS     # first CTE to get the people laid off grouping by company and years
+(
+SELECT company, YEAR(`date`), SUM(total_laid_off)
+FROM layoffs_staging2
+GROUP BY company, YEAR(`date`)
+), Company_Year_Rank AS      # second CTE to filter based on the rank
+(
+SELECT *, DENSE_RANK() OVER(PARTITION BY years ORDER BY total_laid_off DESC) AS Ranking
+FROM Company_Year
+WHERE years IS NOT NULL
+ORDER BY Ranking
+)
+SELECT * FROM Company_Year_Rank
+WHERE Ranking<=5;
 
