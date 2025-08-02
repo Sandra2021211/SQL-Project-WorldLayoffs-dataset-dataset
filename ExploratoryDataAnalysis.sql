@@ -2,6 +2,13 @@
 
 SELECT * FROM layoffs_staging2;
 
+#Null value and Data Quality checks 
+
+SELECT COUNT(*) AS total_rows,
+SUM(total_laid_off IS NULL) AS null_laid_off, SUM(percentage_laid_off IS NULL) AS null_percent,
+SUM(`date` IS NULL) AS null_date
+FROM layoffs_staging2;
+
 # to find out maximum employees laid off and max % of employees laid off
 
 SELECT MAX(total_laid_off), MAX(percentage_laid_off) FROM layoffs_staging2;
@@ -46,10 +53,11 @@ SELECT stage, SUM(total_laid_off)
 FROM layoffs_staging2
 GROUP BY stage ORDER BY 2 DESC;
 
-#Maximum layoff % per company
+#Maximum layoff % per company - layoff rate analysis
 
 SELECT company, MAX(percentage_laid_off) AS max_laid_off
 FROM layoffs_staging2
+WHERE percentage_laid_off IS NOT NULL
 GROUP BY company ORDER BY 2 DESC;
 
 #Filter for companies with 100% layoffs
@@ -62,5 +70,15 @@ SELECT company, SUM(total_laid_off), MAX(percentage_laid_off)
 FROM layoffs_staging2
 GROUP BY company
 ORDER BY 2 DESC;
+
+# Layoffs over time(trend)
+
+SELECT YEAR(`date`), MONTH(`date`), SUM(total_laid_off)
+FROM layoffs_staging2
+GROUP BY YEAR(`date`), MONTH(`date`)
+ORDER BY 1,2;
+
+
+
 
 
